@@ -39,8 +39,3 @@ and the canonical reference numbers in the executable check
 - Work is tracked in GitHub issues; ideas live in `docs/ideas.md`.
 
 This is a measurement rig, not a game and not a stack decision.
-
-
----
-
-Imported from https://github.com/newYurk/rollery/commit/ce5b186689f281521b231a0fb413d37326f441f7
