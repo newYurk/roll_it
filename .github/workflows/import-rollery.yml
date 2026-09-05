@@ -25,11 +25,14 @@ jobs:
           echo "SOURCE_SHA=$(git -C /tmp/rollery rev-parse HEAD)" >> "$GITHUB_ENV"
           git -C /tmp/rollery log -1 --format="%h %s"
 
-      - name: Copy snapshot (keep this workflow and review request)
+      - name: Copy snapshot (keep this workflow)
         run: |
-          # Preserve the review brief that already lives on main as README.
           if [ -f README.md ]; then cp README.md /tmp/REVIEW_REQUEST.md; fi
-          rsync -a --delete --exclude ".git/" --exclude ".github/workflows/import-rollery.yml" /tmp/rollery/ ./
+          rsync -a --delete \
+            --exclude ".git/" \
+            --exclude ".github/" \
+            /tmp/rollery/ ./
+          mkdir -p .github/workflows
           if [ -f /tmp/REVIEW_REQUEST.md ]; then cp /tmp/REVIEW_REQUEST.md REVIEW_REQUEST.md; fi
           printf '\n\n---\n\nImported from https://github.com/newYurk/rollery/commit/%s\n' "$SOURCE_SHA" >> README.md
 
