@@ -1,0 +1,46 @@
+name: Import rollery snapshot
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [import/rollery-prototype]
+    paths:
+      - ".github/workflows/import-rollery.yml"
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout roll_it branch
+        uses: actions/checkout@v4
+        with:
+          ref: import/rollery-prototype
+          fetch-depth: 0
+
+      - name: Clone rollery snapshot
+        run: |
+          git clone --depth 1 https://github.com/newYurk/rollery.git /tmp/rollery
+          echo "SOURCE_SHA=$(git -C /tmp/rollery rev-parse HEAD)" >> "$GITHUB_ENV"
+          git -C /tmp/rollery log -1 --format="%h %s"
+
+      - name: Copy snapshot (keep this workflow and review request)
+        run: |
+          # Preserve the review brief that already lives on main as README.
+          if [ -f README.md ]; then cp README.md /tmp/REVIEW_REQUEST.md; fi
+          rsync -a --delete --exclude ".git/" --exclude ".github/workflows/import-rollery.yml" /tmp/rollery/ ./
+          if [ -f /tmp/REVIEW_REQUEST.md ]; then cp /tmp/REVIEW_REQUEST.md REVIEW_REQUEST.md; fi
+          printf '\n\n---\n\nImported from https://github.com/newYurk/rollery/commit/%s\n' "$SOURCE_SHA" >> README.md
+
+      - name: Commit and push snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Import full Rollery prototype from newYurk/rollery@${SOURCE_SHA}"
+          git push origin import/rollery-prototype
