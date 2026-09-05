@@ -1,0 +1,130 @@
+[
+  {
+    "uMm": 46.5,
+    "status": "valid",
+    "diagnostics": [],
+    "placementWindowMm": {
+      "nearEdgeMm": 20,
+      "farEdgeMm": 52.5
+    },
+    "visiblePatches": [
+      {
+        "id": "cucumber-0",
+        "areaMm2": 64,
+        "centerXmm": 0,
+        "centerYmm": 0
+      }
+    ],
+    "hashes": {
+      "recipe": "c984a6daef2e425b243373c7a81e4d6a2bc567315028660d1516dd480159751e",
+      "winding": "d22e16744f2df2a5f1802d7387d395676d43fd52438a7b0c57976839a2e7541f",
+      "section": "fe9883051fb41b78ef5e372c3f3ddd69866b3cefb425b2049c9fe05f6a1d1dd5"
+    }
+  },
+  {
+    "uMm": 47.5,
+    "status": "valid",
+    "diagnostics": [],
+    "placementWindowMm": {
+      "nearEdgeMm": 20,
+      "farEdgeMm": 52.5
+    },
+    "visiblePatches": [
+      {
+        "id": "cucumber-0",
+        "areaMm2": 64,
+        "centerXmm": 0,
+        "centerYmm": 0
+      }
+    ],
+    "hashes": {
+      "recipe": "c3c46fc5757bc0a5517bb87168de388e364c82df86904312d3d31a88955c2ef0",
+      "winding": "d22e16744f2df2a5f1802d7387d395676d43fd52438a7b0c57976839a2e7541f",
+      "section": "fe9883051fb41b78ef5e372c3f3ddd69866b3cefb425b2049c9fe05f6a1d1dd5"
+    }
+  },
+  {
+    "uMm": 48.5,
+    "status": "valid",
+    "diagnostics": [],
+    "placementWindowMm": {
+      "nearEdgeMm": 20,
+      "farEdgeMm": 52.5
+    },
+    "visiblePatches": [
+      {
+        "id": "cucumber-0",
+        "areaMm2": 64,
+        "centerXmm": 0,
+        "centerYmm": 0
+      }
+    ],
+    "hashes": {
+      "recipe": "83e46eb4e723f04b71579e4d32becc6f45f766d6ee1d16d5ccf503a52616db27",
+      "winding": "d22e16744f2df2a5f1802d7387d395676d43fd52438a7b0c57976839a2e7541f",
+      "section": "fe9883051fb41b78ef5e372c3f3ddd69866b3cefb425b2049c9fe05f6a1d1dd5"
+    }
+  },
+  {
+    "uMm": 49.5,
+    "status": "outsideModelScope",
+    "diagnostics": [
+      {
+        "code": "closure_window",
+        "message": "patch footprint outside placementWindowMm",
+        "context": {
+          "patchId": "cucumber-0",
+          "placementWindowMm": {
+            "nearEdgeMm": 20,
+            "farEdgeMm": 52.5
+          },
+          "observedFootprintMm": [
+            45.5,
+            53.5
+          ]
+        }
+      }
+    ],
+    "placementWindowMm": {
+      "nearEdgeMm": 20,
+      "farEdgeMm": 52.5
+    },
+    "visiblePatches": [],
+    "hashes": {
+      "recipe": "b4b4a8a436441670768adac47be85435170a8d019283d523200849026538afc7",
+      "winding": "",
+      "section": ""
+    }
+  },
+  {
+    "uMm": 50.5,
+    "status": "outsideModelScope",
+    "diagnostics": [
+      {
+        "code": "closure_window",
+        "message": "patch footprint outside placementWindowMm",
+        "context": {
+          "patchId": "cucumber-0",
+          "placementWindowMm": {
+            "nearEdgeMm": 20,
+            "farEdgeMm": 52.5
+          },
+          "observedFootprintMm": [
+            46.5,
+            54.5
+          ]
+        }
+      }
+    ],
+    "placementWindowMm": {
+      "nearEdgeMm": 20,
+      "farEdgeMm": 52.5
+    },
+    "visiblePatches": [],
+    "hashes": {
+      "recipe": "29dde8759f19238e6b88e2f4671d74e544a0cd7f10154980f08dd151e2e77455",
+      "winding": "",
+      "section": ""
+    }
+  }
+]

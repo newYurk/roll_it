@@ -1,0 +1,279 @@
+...@_style
+
+# ═══════════════════════════════════════════════════════════════════════
+#  ЛИСТ 1 — КАРТА СИСТЕМЫ
+#
+#  ОДНО РЕШЕНИЕ, РАДИ КОТОРОГО ЛИСТ СУЩЕСТВУЕТ:
+#    «я пишу новое — в какую зону это кладётся и кого ей можно звать?»
+#
+#  Поэтому здесь НЕТ ни одной стрелки между файлами: стрелки только между
+#  зонами. Внутренности зоны — опись, а не граф. Кто кого зовёт на самом
+#  деле и почему это больно — лист 2. Как проходит одно действие — лист 3.
+#
+#  Числа строк — ВЕСЬ файл, снято на коммите e6ae124 (01.09.2026).
+#  Руками не переписывать: меряет и сверяет docs/architecture/atlas-facts.py.
+#  У geometry.js подписано отдельно и код, и всего: 1136 из 2077 строк там —
+#  комментарии, и стороннее ревью на этом ошиблось, назвав «2000 строк кода».
+#
+#  ⚠ ПРО ПЕРЕНОСЫ. Каждая строка внутри |md …| кончается обратной косой:
+#  это жёсткий перенос markdown. Без него d2 сливает абзац в одну строку и
+#  лист растягивается в ленту в двадцать тысяч пикселей — проверено.
+# ═══════════════════════════════════════════════════════════════════════
+
+direction: down
+
+title: |md
+  # 1 · Карта системы: что существует
+
+  Стрелки — между **зонами**, не между файлами: это право вызова, а не поток. \
+  Внутри зоны — опись. Как оно устроено на самом деле — лист 2.
+| {class: head; near: top-center}
+
+catalog: "catalog · что бывает на свете" {
+  class: zone
+  about: |md
+    Статические данные. Не знают \
+    ни про сессию, ни про холст.
+  | {class: note}
+  util: |md
+    **model/util.js** · 45 \
+    TAU · clamp · hash \
+    HAND_NEUTRAL · handOf · turnsOf
+  | {class: file}
+  cat: |md
+    **model/catalog.js** · 427 \
+    BASES · ING · R0 · U_MM · turnsFor \
+    базы: хосо · футо · **узумаки** · фрукты \
+    свойства: stiff · crumbly · axial · mixed · bedDelta
+  | {class: file}
+  canon: |md
+    **model/canon.js** · 268 \
+    CANON · canonLayout · canonCheck
+  | {class: file}
+  inv: |md
+    **inverse/** · 280 \
+    primitives.js · materials.js \
+    чистые каталоги, сверяются с ING
+  | {class: file}
+}
+
+session: "state · что выбрал игрок" {
+  class: zone
+  about: |md
+    Единственное место в стенде, \
+    которое трогает localStorage.
+  | {class: note}
+  st: |md
+    **state.js** · 263 \
+    S · patches() · B() \
+    история · load() · save() · uiBases()
+  | {class: file}
+}
+
+model: "geometry · что из этого получится" {
+  class: zone
+  about: |md
+    Детерминированный расчёт. \
+    **Ядро продукта.**
+  | {class: note}
+  geo: |md
+    **model/geometry.js** · 2848 всего, 1003 кода \
+    buildModel → g (паспорт) → restack \
+    computeCore · wind · windFor · matAt \
+    две ветки намотки: кольцо и `winding: 'spiral'` \
+    форму считает МОДЕЛЬ: FACE_SETS, pressFaces
+  | {class: file}
+}
+
+# ⚑ ВТОРОЙ ДВИЖОК, А НЕ ЗАМЕНА ПЕРВОГО (PR #172, влит 05.09.2026).
+# Считает то же самое — раскладка → скрутка → срез, — но в МИЛЛИМЕТРАХ и заново.
+# geometry.js жив и считает игру; V2 включается флагом ?v2 и отдаёт наружу
+# ровно две вещи: картинку среза и радиус ролла.
+core_v2: "core-v2 · то же самое, но в миллиметрах" {
+  class: zone
+  about: |md
+    Параллельное ядро. **Не импортирует `play/model/**`** — \
+    ни каталога, ни геометрии, ни состояния. \
+    Каталог приходит аргументом, не импортом. \
+    Наружу — только через `adapter.js`.
+  | {class: note}
+  units: |md
+    **core-v2/units.js** · 323 \
+    константы и снимки каталога в мм \
+    U_MM · окно раскладки · пороги EPS \
+    packCoreRows — жёсткая упаковка ядра
+  | {class: file}
+  pipe: |md
+    **validate → winding → section → measure** \
+    validate.js · 194 — честный отказ с кодом \
+    winding.js · 261 — кольцо: r0 по лучам, шов \
+    section.js · 110 — срез и площадь кольца \
+    measure.js · 117 — FixtureReport
+  | {class: file}
+  gate: |md
+    **fixtures.js** · 516 · приёмка F01–F07 \
+    core-v2.test.mjs — 56 тестов \
+    run-fixtures.mjs — шлюз CI (.github/workflows/core-v2.yml) \
+    hash.js + canonical.js — детерминизм
+  | {class: guard}
+  seam: |md
+    **adapter.js** · 46 — единственный объект наружу \
+    **bridge.js** · 79 — ESM → window.CoreV2 \
+    from-layout.js · 192 — раскладка игрока → RecipeV2 \
+    render.js · 413 · app.js · 253 — свой debug-стенд
+  | {class: target}
+}
+
+facade: "domain · шов наружу" {
+  class: zone
+  about: |md
+    Тонкий фасад над геометрией (#72). \
+    Боевого потребителя нет: зовёт \
+    только собственный сторож.
+  | {class: note}
+  roll: |md
+    **domain/roll.js** · 303 \
+    createRecipe · evaluateRoll · sliceAt \
+    materialMapOf · compareRolls
+  | {class: file}
+}
+
+render: "render · как это выглядит" {
+  class: zone
+  about: |md
+    Canvas 2D. Здесь же кеши картинок.
+  | {class: note}
+  slice: |md
+    **render/slice.js** · 655 \
+    renderSection · face · faceCache \
+    marchMask · sliceLines
+  | {class: file}
+  sheet: |md
+    **render/sheet.js** · 383 \
+    лист · ролл · нож · силуэты
+  | {class: file}
+  screens: |md
+    **render/screens.js** · 446 \
+    drawLay · drawCut · drawSlicing · drawPlate
+  | {class: file}
+}
+
+ui: "ui · ввод и раскладка экрана" {
+  class: zone
+  layout: |md
+    **ui/layout.js** · 436 \
+    L — вся раскладка экрана \
+    W · H · DPR · resize
+  | {class: file}
+  actions: |md
+    **ui/actions.js** · 235 \
+    onDown · onMove · onUp · action() \
+    measureHand — почерк из жеста
+  | {class: file}
+  controls: |md
+    **ui/controls.js** · 257 \
+    кнопки · чипы · верхняя панель
+  | {class: file}
+  album: |md
+    **ui/album.js** · 139 \
+    сохранённые роллы, миниатюры
+  | {class: file}
+}
+
+modes: "modes · игровая оболочка" {
+  class: zone
+  about: |md
+    Правила конкретного опыта. \
+    Геометрию менять не вправе.
+  | {class: note}
+  puzzle: |md
+    **modes/puzzle.js** · 164 \
+    LEVELS · genTarget · puzzleEvaluate \
+    encodePuzzle / decodePuzzle
+  | {class: file}
+}
+
+storage: "storage · что переживает перезагрузку" {
+  class: zone
+  ls: |md
+    **localStorage** \
+    rollery.model.v2 · album · preview \
+    mute · shape · cuts
+  | {class: store}
+  url: |md
+    **адрес страницы** \
+    #p=… — пазл-ссылка \
+    ?full · ?puzzle · ?check
+  | {class: store}
+}
+
+checks: "сторож · чем доказывается, что не сломали" {
+  class: zone
+  ch: |md
+    **play/checks.js** · 1709 \
+    **`node tools/check.js`** — 5,6 с, без браузера (#147) \
+    ВСЁ ЦЕЛО · известно 31 · сдвиг ⌀ 1 \
+    он же `?check` в браузере: холст и DPR только там
+  | {class: guard}
+  practice: |md
+    **test/practice.js** · 1121 \
+    практика поваров: сошлось 25 \
+    не проверяется 10 — и каждое со ссылкой на issue
+  | {class: guard}
+  base: |md
+    **test/legacy/** · 809 \
+    слепок поведения до переезда
+  | {class: guard}
+}
+
+sim: "sim · лаборатория (Python)" {
+  class: zone-off
+  about: |md
+    В рантайме игры её **НЕТ**. Числа \
+    переезжают в каталог руками, через доки.
+  | {class: note}
+  labs: |md
+    fold.py · spiral · mpm-shell · kin-mat \
+    reference · lab
+  | {class: file}
+}
+
+# ── право вызова ────────────────────────────────────────────────────────
+catalog -> session: определения {class: ok}
+catalog -> model: определения {class: ok}
+session -> model: текущий выбор {class: ok}
+model -> render: "**интерфейс `обёртка` — 8 вопросов**" {class: ok}
+ui -> session: команды игрока {class: ok}
+ui -> render: раскладка экрана {class: ok}
+modes -> session: цель и уровень {class: ok}
+modes -> model: сравнение с эталоном {class: ok}
+session -> storage: load / save {class: ok}
+modes -> storage: ссылка-пазл {class: ok}
+facade -> model {class: ok}
+# ⚑ ЕДИНСТВЕННЫЕ ДВА РЕБРА V2. Больше игра о ядре ничего не знает.
+facade -> core_v2: "раскладка игрока → RecipeV2 (`domain/recipe-v2.js` · 65)" {class: ok}
+core_v2 -> render: "снимок: срез и радиус, только при ?v2" {class: ok}
+checks -> model: прогон инвариантов {class: faint}
+checks -> facade: единственный потребитель {class: faint}
+sim -> catalog: калибровка — руками, через доки {class: faint}
+
+legend: |md
+  **Как читать.** Зона — право вызова, а не папка на диске: `catalog` живёт \
+  в `play/model/`, `state` — один файл в корне `play/`.
+
+  **Чего на этом листе нарочно нет.** Ни одной обратной стрелки. Здесь \
+  нарисовано, как система **задумана** — целевые зоны доменного контракта \
+  §4. Как она устроена на самом деле, показывает лист 2, и стрелок там \
+  больше, чем здесь.
+
+  **Одна граница за день стала настоящей** (01.09, #146). Намотка больше \
+  не раздаёт массивы: наружу идёт объект `обёртка` из восьми вопросов — \
+  `внутр` · `внеш` · `есть` · `толщина` · `витокЕсть` · `накрыт` · \
+  `крайВитка` · `голый`. Спрашивающий больше не обязан знать, что слой \
+  k = 1 — это обёртка, и вторая ветка намотки (спираль) прошла сквозь тех \
+  же пятерых потребителей, ничего им не сломав.
+
+  ⚠ Не совсем ни одного: `wd.top.length` снаружи ещё читают в двух местах \
+  (`render/slice.js:519`, `test/practice.js:250`). Но там берут ЧИСЛО \
+  БИНОВ, а не устройство кольца, и на спирали оно то же самое.
+| {class: note; near: bottom-center}

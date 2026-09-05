@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ролльня · срез V2</title>
+<meta name="rollery-v" content="1">
+<script>
+/* ⚑ МАЯК ВЕРСИИ (#144). Маркер ?v= в ссылке лечит страницу, НА КОТОРУЮ ссылаются: адрес
+   меняется — браузер обязан сходить за файлом. Точку входа он не лечит в принципе: её
+   адрес набирают или держат в закладке, ссылки на неё нет. Свои заголовки на GitHub Pages
+   не задать — CDN отдаёт cache-control: max-age=600. 05.09 так и вышло: карточка «Срез V2»
+   уехала в репозиторий, а на телефоне владельца её не было, и понять это было нечем.
+
+   Маяк идёт за ЭТОЙ ЖЕ страницей мимо кэша и сверяет версию. Он НЕ перезагружает сам:
+   молчаливая перезагрузка увела бы игрока с середины раскладки, а зациклиться она могла бы,
+   пока CDN держит старую копию. Он показывает полосу — жмёт человек.
+
+   Код встроен, а не вынесен в файл: вынесенный чинильщик кэша сам приезжает из кэша.
+   Версия берётся из самой страницы, а не из отдельного version.txt, — иначе появляется
+   второй источник правды, который забудут поднять ровно тогда, когда маяк нужен. */
+(function () {
+  var meta = document.querySelector('meta[name="rollery-v"]');
+  if (!meta || !window.fetch) return;
+  var своя = meta.content;
+  fetch(location.pathname + '?beacon=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.text() : null; })
+    .then(function (t) {
+      var m = t && t.match(/name="rollery-v" content="([^"]+)"/);
+      if (!m || m[1] === своя) return;
+      var bar = document.createElement('div');
+      bar.textContent = 'Свежая версия ' + m[1] + ' · у вас ' + своя + ' — обновить';
+      bar.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99999;padding:12px;' +
+        'font:14px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;text-align:center;' +
+        'cursor:pointer;background:#e0b25f;color:#171713;border-top:2px solid #171713';
+      bar.onclick = function () { location.href = location.pathname + '?v=' + m[1]; };
+      (document.body || document.documentElement).appendChild(bar);
+    })
+    .catch(function () {});
+})();
+</script>
+<style>
+  :root {
+    --bg: #171713;
+    --ink: #f3e7ca;
+    --dim: #9a9280;
+    --line: #2b2a22;
+    --hot: #e0b25f;
+    --surface: #1d1c17;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%; height: 100dvh;
+    background: var(--bg); color: var(--ink);
+    font: 13px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+    overflow: hidden;
+  }
+  body {
+    display: flex; flex-direction: column;
+    padding: max(8px, env(safe-area-inset-top)) 10px max(8px, env(safe-area-inset-bottom));
+  }
+  .view {
+    flex: 1 1 auto; min-height: 0;
+    display: grid; place-items: center;
+  }
+  #slice {
+    max-width: 100%; max-height: 100%;
+    width: auto; height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: 8px;
+  }
+  .refuse {
+    max-width: 22em; color: var(--dim); text-align: center; line-height: 1.5;
+  }
+  .dock {
+    flex: 0 0 auto;
+    display: flex; flex-direction: column; gap: 6px;
+    padding-top: 6px;
+  }
+  .chips {
+    display: flex; gap: 6px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  button.chip, button.cut {
+    appearance: none; cursor: pointer; flex: 0 0 auto;
+    background: transparent; color: var(--dim);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 7px 12px; font: inherit; font-size: 12px;
+    min-height: 36px;
+  }
+  button.chip[aria-pressed="true"], button.cut {
+    color: var(--bg); background: var(--hot); border-color: var(--hot);
+  }
+  button.cut:disabled { opacity: 0.35; cursor: default; }
+  button.chip:focus-visible, button.cut:focus-visible {
+    outline: 2px solid var(--hot); outline-offset: 2px;
+  }
+  .meta {
+    color: var(--dim); font-size: 11px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .meta b { color: var(--ink); font-weight: 600; }
+  .ok { color: #b7c59a; }
+  .no { color: #c4a27a; }
+  #bar { width: 100%; height: 124px; display: block; touch-action: none; cursor: grab; border-radius: 6px; }
+</style>
+</head>
+<body>
+  <div class="view">
+    <canvas id="slice" width="720" height="720"></canvas>
+    <div id="refuse" class="refuse" hidden></div>
+  </div>
+  <div class="dock">
+    <div class="chips" id="chips"></div>
+    <div class="meta" id="meta"></div>
+    <canvas id="bar" width="720" height="124"></canvas>
+  </div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
